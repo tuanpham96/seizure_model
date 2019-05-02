@@ -1,21 +1,15 @@
-%% Initialize simulation 
-
-%% Adding paths 
-run essential_startup.m
+%% Set up and initialize simulation 
 
 %% File 
 % data_folder:  for storage 
 % file_pref:    file prefix 
-%               * remember to change for each simulation 
-% set_up.data_folder  = fullfile(set_up.head_dir, 'data/rec'); 
-
-set_up.data_folder  = fullfile('../../../data/rec'); 
-set_up.file_pref    = 'test01';
+%               * remember to change for each simulation  
+set_up.file_pref    = file_pref;
 
 %% Simulation time variables
 % tstop:        stop time in [ms], assumed run from 0ms
 % dt:           time step [ms] 
-set_up.tstop = 10e3;    % ms  
+set_up.tstop = 20e3;    % ms  
 set_up.dt = 1/10;       % ms 
 
 %% Simulation neuron variables 
@@ -34,24 +28,16 @@ set_up.spatial_distribution = struct();
 % Either of these options 
 % 1. Rectangular 2D 
 %   size:   number of points in X axis x number of points in Y axis 
-%     set_up.spatial_distribution.type = 'rect'; 
-%     set_up.spatial_distribution.size = [30, 30]; % this depends on num_neurons 
+    set_up.spatial_distribution.type = 'rect'; 
+    set_up.spatial_distribution.size = [30, 30]; % this depends on num_neurons 
     
-% 2. Spherical Fibonnaci lattice 3D 
+% 2. Spherical Fibonnaci latice 3D 
 %   norm:   how to normalize the distance between points
 %           'arc':  normalize by smallest arc length on the sphere surface
 %           'eucl': by the smallest euclidean distance 
 %     set_up.spatial_distribution.type = 'sphere'; 
 %     set_up.spatial_distribution.norm = 'arc'; 
 
-% 3. Lattice 2D
-%   lattice_template:   a matrix of n_neuron_in_template x 2 (which is 
-%                       basically x and y coordinate)
-%   index_template:     a column vector of n_neuron_in_template signifying
-%                       if a neuron is excitatory (+1) or inhibitory (-1)
-%   lattice_distance:   distance between the templates 
-    set_up.spatial_distribution.type = 'lattice'; 
-    set_up.spatial_distribution.lattice_distance = 2; 
 
 %% Simulation synaptic variables 
 
@@ -76,10 +62,11 @@ set_up.spatial_distribution = struct();
 %               [default = 0] 
 
 set_up.weight_prm = struct(); 
-set_up.weight_prm.EtoE = struct('k', 8, 'type', 'gauss', 'dist_range', [0, 5]);
-set_up.weight_prm.EtoI = struct('k', 8, 'type', 'gauss', 'dist_range', [0, 15]); 
-set_up.weight_prm.ItoE = struct('k', 20, 'type', 'gauss'); 
-set_up.weight_prm.ItoI = struct('k', 20, 'type', 'gauss'); 
+set_up.weight_prm.EtoE = struct('k', k_sE2E, 'm', m_sE2E, ...
+    'type', 'gauss', 'dist_range', [0, 7]);
+set_up.weight_prm.EtoI = struct('k', 30, 'type', 'gauss', 'dist_range', [0, 10]); 
+set_up.weight_prm.ItoE = struct('k', 40, 'type', 'gauss', 'dist_range', [0, 15]); 
+set_up.weight_prm.ItoI = struct('k', 40, 'type', 'gauss', 'dist_range', [0, 15]); 
 
 % syn_scale_type:   scaling factor 
 %                   'unity':  no scaling 
@@ -90,10 +77,10 @@ set_up.syn_scale_type = 'sqrt';
 % Gsyn:         maximal synaptic conductance for different connectivity
 %               G = Gmax * S / scaled
 set_up.Gsyn = struct();
-set_up.Gsyn.EtoE = 16; 
-set_up.Gsyn.EtoI = 16;
+set_up.Gsyn.EtoE = 10; 
+set_up.Gsyn.EtoI = 10;
 set_up.Gsyn.ItoE = 3;
-set_up.Gsyn.ItoI = 1;
+set_up.Gsyn.ItoI = 0.5;
 
 
 %% External input
@@ -101,12 +88,12 @@ set_up.Gsyn.ItoI = 1;
 % fact_durramp:     factor of simulation time for ramp-up phase 
 % fact_decay:       decay factor for exponential decay after, 
 %                   meaning smaller -> faster
-set_up.Iapp_max       = 800; 
+set_up.Iapp_max       = 700; 
 set_up.fact_durramp   = 3/5;
 set_up.fact_decay     = 0.7;  
 
 % num_stimulated:   number of neurons to stimulate around the centered one 
-percent_stim = 0.03; 
+percent_stim = 0.05; 
 set_up.num_stimulated = ceil(percent_stim*set_up.num_neurons);  
 
 %% Estimated rate 
@@ -114,12 +101,10 @@ set_up.num_stimulated = ceil(percent_stim*set_up.num_neurons);
 % edge_lim:     the edge limit to count within [second]
 % smooth_size:  number of points to perform gaussian smoothing [points]
 set_up.rate_prm = struct();        % all in seconds here 
-set_up.rate_prm.bin_size = 20e-3;  
+set_up.rate_prm.bin_size = 50e-3;  
 set_up.rate_prm.edge_lim = [0, set_up.tstop]*1e-3; 
 set_up.rate_prm.smooth_size = 10;  % number of points 
 
 %% Simulate 
-clearvars -except set_up
-
 run run_sim.m
 

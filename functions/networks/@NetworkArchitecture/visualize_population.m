@@ -17,10 +17,14 @@ PI = obj.pop_ind.PI;
 
 spatial_type = obj.coord.type;
 switch spatial_type
-    case {'RECT', 'LATTICE'}
+    case 'RECT'
         x = obj.coord.x;
         y = obj.coord.y;
         mrkscl = 1;
+    case 'LATTICE'
+        x = obj.coord.x;
+        y = obj.coord.y;
+        mrkscl = 1/2;
     case 'SPHERE'
         x = obj.coord.proj_x;
         y = obj.coord.proj_y;

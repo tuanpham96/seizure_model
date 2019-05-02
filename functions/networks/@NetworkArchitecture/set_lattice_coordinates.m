@@ -9,7 +9,7 @@ num_tmpl = num_on_side^2;
 new_num_neurons = num_nrn_lat * num_tmpl; 
 
 % Major lattice to distribute the template 
-axis_majr = (0:(num_on_side-10)) * dist_majr; 
+axis_majr = (0:(num_on_side-1)) * dist_majr; 
 lat_majr = return_combination(axis_majr, axis_majr); 
 
 % Final lattice and marked indices

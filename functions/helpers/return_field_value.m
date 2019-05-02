@@ -1,6 +1,6 @@
 function varargout = return_field_value(struct_obj, varargin)
 
-if mod(length(varargin),2) ~= 0 || length(varargin) < 3
+if mod(length(varargin),2) ~= 0 || length(varargin) < 2
     error('The inputs need to come in pairs ("field_name", "default_value")');
 end
 
