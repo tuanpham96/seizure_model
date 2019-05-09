@@ -14,6 +14,8 @@ classdef EI3NodeMotif < handle
         
         ID = weimat2ID(M)
         
+        M = ID2mat(id)
+        
         function x = hashed_vec(v)
             conv_factor = 3.^(5:-1:0); 
             x = sum((v + 1) .* conv_factor, 2);

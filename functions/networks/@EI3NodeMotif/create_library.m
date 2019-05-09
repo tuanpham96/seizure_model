@@ -15,8 +15,15 @@ raw_ids = 1:n_combos;
 all_node_perms = perms(1:num_nodes); 
 n_perms = size(all_node_perms, 1); 
 
-for i = 1:(n_combos - 1)
+subgraph_matrices = cell(n_combos, 1); 
+
+for i = 1:n_combos
     mat_i = EI3NodeMotif.vec2weimat(all_wei_combos(i,:));
+    subgraph_matrices{i} = mat_i; 
+    
+    if i == n_combos
+        break;
+    end
     
     for j = (i + 1):n_combos
         mat_j = EI3NodeMotif.vec2weimat(all_wei_combos(j,:));
@@ -38,5 +45,5 @@ end
 
 subgraph_keys = EI3NodeMotif.hashed_vec(all_wei_combos); 
 
-save('ei3nodemotif_library.mat', 'subgraph_keys', 'subgraph_values'); 
+save('ei3nodemotif_library.mat', 'subgraph_keys', 'subgraph_values', 'subgraph_matrices'); 
 end
