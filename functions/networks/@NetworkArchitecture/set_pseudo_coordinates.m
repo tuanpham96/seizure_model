@@ -40,8 +40,15 @@ switch spatial_type
         
         dist_majr = return_field_value(spatial_distribution, 'lattice_distance', 2);
             
+        set_num_nrn = obj.num_neurons; 
         obj.set_lattice_coordinates(lat_tmpl, ind_tmpl, dist_majr);
-
+        curr_num_nrn = obj.num_neurons; 
+        
+        if set_num_nrn ~= curr_num_nrn
+            warning(['The choice of "LATTICE" spatial distribution changed the' ...
+                ' number of neurons from %d to %d. Will proceed anyway'], ...
+                set_num_nrn, curr_num_nrn);
+        end
     otherwise
         error(gen_err_type);
 end

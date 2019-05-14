@@ -50,9 +50,10 @@ if ~inp_is_struct && ~inp_has_param
     label = {}; 
 end
 
-if ~all(cellfun(valid_vec, vec, 'uni', 1))
-    error('All vectors need to be numeric vectors');
-end
+% TODO: assess if needed
+% if ~all(cellfun(valid_vec, vec, 'uni', 1))
+%     error('All vectors need to be numeric vectors');
+% end
     
 tmp_cell = cell(num,1);
 [tmp_cell{:}] = ndgrid(vec{:}); 
