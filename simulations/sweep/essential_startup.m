@@ -1,10 +1,14 @@
-%% Declare and add essential paths 
+%% Declare and add essential paths
 clc; clear; close all;
-set_up.head_dir = '../..';
+head_dir = '../..';
 
-set_up.prm_folder  = fullfile(set_up.head_dir, 'prm'); 
-set_up.func_folder = fullfile(set_up.head_dir, 'functions');
+prm_folder  = fullfile(head_dir, 'prm');
+func_folder = fullfile(head_dir, 'functions');
 
-addpath(genpath(set_up.prm_folder)); 
-addpath(genpath(set_up.func_folder)); 
+ext_pck2add = {'yamlmatlab', 'GetFullPath'}; 
+ext_folder = fullfile(head_dir, 'extpckgs'); 
 
+addpath(genpath(prm_folder));
+addpath(genpath(func_folder));
+
+cellfun(@(x) addpath(genpath(fullfile(ext_folder, x))), ext_pck2add); 

@@ -4,6 +4,8 @@ classdef NetworkArchitecture < handle
         pop_ind
         coord
         centered_neuron
+        side_neuron
+        corner_neuron
         dist
         syn_strength
         syn_conductance 
@@ -35,7 +37,9 @@ classdef NetworkArchitecture < handle
         set_strength_matrices(obj, weight_prm)
                  
         neigh_ind = pick_random_neighbors(obj, num_neigh, start_ind)
-          
+        
+        stim_ind = set_stimulated_indices(obj, location, num_stim) 
+        
         mu_s = set_specific_strength(obj, prm_strct)
         
         mu_s = return_mu_s(obj, k_s, m_s, type_s, ...

@@ -43,7 +43,9 @@ ax4 = axes(general_style{:}, 'position', pos_ax4);
 arrayfun(@(ax) hold(ax, 'on'), [ax1, ax2, ax3, ax4]);
 
 % Plotting input time series
-inp = normalize_minmax(inp(further_marked, :));
+if size(inp, 1) > 1
+    inp = normalize_minmax(inp(further_marked, :));
+end
 plot(ax2, t_in, inp, '-k', 'LineWidth', 1);
 
 % Plotting EXC time series
@@ -68,7 +70,8 @@ writeVideo(vid_write, vid_frame);
 
 % Discretize amplitude levels into discrete colors
 num_lvl = 100;
-cmap = flipud(gray(num_lvl));
+cmap = flipud(gray(num_lvl*2));
+cmap = cmap(num_lvl+1:end,:); 
 
 res_rng = [min(resp, [], 'all'), max(resp, [], 'all')];
 res_amp = (resp - res_rng(1))/abs(diff(res_rng));
@@ -82,7 +85,9 @@ for i = 1:length(t_res)
     % Overlay with the current amplitude
     delete(sc_handle);
     sc_handle = scatter(ax1, x, y, 70*mrkscl, cmap(ri,:), 'o', 'filled');
-    title(ax1, sprintf('t = %.2f s', ti), ttl_style{:});
+    ti_sec = floor(ti); 
+    ti_ms = 1000*(ti - ti_sec); 
+    title(ax1, sprintf('t = %.0fs, %03.fms', ti_sec, ti_ms), ttl_style{:});
     legend(ax1, gobj4lgdn, 'Location', loc_ax1_lgnd);
     
     % Move vertical time line
