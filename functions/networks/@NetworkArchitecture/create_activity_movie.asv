@@ -1,9 +1,5 @@
 function create_activity_movie(obj, vid_name, t_res, resp, t_in, inp, further_marked, color_opt)
 
-if nargin < 8
-    color_opt = 'EI';
-end
-
 % Set positions of axes and location of legend
 switch obj.coord.type
     case {'RECT', 'LATTICE'}
@@ -74,7 +70,6 @@ writeVideo(vid_write, vid_frame);
 
 % Discretize amplitude levels into discrete colors
 num_lvl = 100;
-sep_colors = false; 
 if isa(color_opt, 'function_handle')
     cmap = color_opt(num_lvl);
 elseif ischar(color_opt) 
@@ -83,29 +78,24 @@ elseif ischar(color_opt)
         cmap_PI = flipud(color2whitegradient(obj.colors.PI, num_lvl));
         PE = obj.pop_ind.PE;
         PI = obj.pop_ind.PI;
-        sep_colors = true; 
     else
-        try 
-            color_opt = str2func(color_opt);
-        catch
-            error('The string "%s" is not an available colormap function', color_opt);
-        end
-        cmap = color_opt(num_lvl);
+        
+% cmap = hot(num_lvl);
+% cmap = flipud(gray(num_lvl));
     end
 end
 
-if sep_colors
-    res_amp = resp;
-    res_rng = [min(resp(PE,:), [], 'all'), max(resp(PE,:), [], 'all')];
-    res_amp(PE,:) = (resp(PE,:) - res_rng(1))/abs(diff(res_rng));
-    res_rng = [min(resp(PI,:), [], 'all'), max(resp(PI,:), [], 'all')];
-    res_amp(PI,:) = (resp(PI,:) - res_rng(1))/abs(diff(res_rng));
-    res_lvl = round((num_lvl - 1) * res_amp) + 1;
-else
-    res_rng = [min(resp, [], 'all'), max(resp, [], 'all')];
-    res_amp = (resp - res_rng(1))/abs(diff(res_rng));
-    res_lvl = round((num_lvl - 1) * res_amp) + 1;
-end
+
+res_rng = [min(resp, [], 'all'), max(resp, [], 'all')];
+res_amp = (resp - res_rng(1))/abs(diff(res_rng));
+res_lvl = round((num_lvl - 1) * res_amp) + 1;
+
+res_amp = resp; 
+res_rng = [min(resp(PE,:), [], 'all'), max(resp(PE,:), [], 'all')];
+res_amp(PE,:) = (resp(PE,:) - res_rng(1))/abs(diff(res_rng));
+res_rng = [min(resp(PI,:), [], 'all'), max(resp(PI,:), [], 'all')];
+res_amp(PI,:) = (resp(PI,:) - res_rng(1))/abs(diff(res_rng));
+res_lvl = round((num_lvl - 1) * res_amp) + 1;
 
 % Plot and write frame for each time point
 for i = 1:length(t_res)
@@ -114,17 +104,16 @@ for i = 1:length(t_res)
     
     % Overlay with the current amplitude
     delete(sc_handle);
-    if i == 1 && sep_colors
+    if i == 1 
         sc_handle = gobjects(2,1);
     end
-    
-    if sep_colors
-        sc_handle(1) = scatter(ax1, x(PE), y(PE), 120*mrkscl, cmap_PE(ri(PE),:), 'o', 'filled');
-        sc_handle(2) = scatter(ax1, x(PI), y(PI), 120*mrkscl, cmap_PI(ri(PI),:), 'o', 'filled');
-    else 
-        sc_handle = scatter(ax1, x, y, 70*mrkscl, cmap(ri,:), 'o', 'filled');
-    end
-
+%     sc_handle = scatter(ax1, x, y, 70*mrkscl, cmap(ri,:), 'o', 'filled');
+%     cmap = cmap_PE; 
+%     cmap(PE,:) = cmap_PE(ri(PE),:); 
+%     cmap(PI,:) = cmap_PI(ri(PI),:); 
+%     sc_handle = scatter(ax1, x, y, 70*mrkscl, cmap(ri,:), 'o', 'filled');
+    sc_handle(1) = scatter(ax1, x(PE), y(PE), 120*mrkscl, cmap_PE(ri(PE),:), 'o', 'filled');
+    sc_handle(2) = scatter(ax1, x(PI), y(PI), 120*mrkscl, cmap_PI(ri(PI),:), 'o', 'filled');
     ti_sec = floor(ti); 
     ti_ms = 1000*(ti - ti_sec); 
     title(ax1, sprintf('t = %.0fs, %03.fms', ti_sec, ti_ms), ttl_style{:});

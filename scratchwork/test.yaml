@@ -1,0 +1,63 @@
+file_pref: sweep_me_now
+paths:
+    functions: ../../functions
+    parameters: ../../prm
+    data: test_dat_path
+tstop: 10000.0
+dt: 0.1
+num_neurons: 900.0
+prob_e: 0.8
+V_init: -60.0
+spatial_distribution: 
+    type: lattice
+    lattice_distance: 2.0
+weight_prm:
+    EtoE: 
+        k: 
+            vec: [1.1, 2.5, 5, 10] 
+            label: k_se2e
+        type: gauss
+        dist_range: [0.0, 5.0]
+    EtoI:
+        k: 8.0
+        type: 
+            vec: [exp, gauss]
+        dist_range:
+            vec: 
+                - [0.0, 15.0]
+                - [1.2, 3.4, 4.5]
+    ItoE: 
+        k: 20.0
+        type: gauss
+    ItoI: 
+        k: 20.0
+        type: gauss
+syn_scale_type: sqrt
+Gsyn: 
+    EtoE: 
+        vec: [10, 15, 20]
+        label: g_e2e
+    EtoI:
+        vec: [8, 10, 12] 
+        label: g_e2i
+    ItoE: 3.0
+    ItoI: 1.0
+stim:
+    Iapp_max: 800.0
+    fact_durramp: 0.6
+    fact_decay: 0.7
+    percent_stim: 
+        vec: [0.01, 0.03, 0.05, 0.10]
+rate_prm:
+    bin_size: 0.02
+    edge_lim: [0.0, 10.0]
+    smooth_size: 10.0
+rando_vec:
+    lvl_1: 
+        vec: 
+            - 
+                - [1, 2, 3]
+                - [3, 5, 6]
+            - 
+                - [13,4,5]
+                - [3, 5, 6] 

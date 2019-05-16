@@ -1,0 +1,3 @@
+[submodule "extpckgs/yamlmatlab"]
+	path = extpckgs/yamlmatlab
+	url = https://github.com/ewiger/yamlmatlab

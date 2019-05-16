@@ -44,10 +44,21 @@ dist2cent = sqrt((x - xcent).^2 + (y - ycent).^2);
 xcent = x(cent_ind); 
 ycent = y(cent_ind); 
 
+% Get side coordinate 
+xside = min(x); 
+yside = ycent; 
+side_ind = find(x == xside & y == yside, 1); 
+
+% Get corner coordinate
+xcorn = xside; 
+ycorn = min(y); 
+corn_ind = find(x == xcorn & y == ycorn, 1); 
+
 % Save to struct and fields
 obj.coord = struct( 'x', x, 'y', y);
 obj.dist = dist_mat;
-obj.centered_neuron = struct( 'x', xcent, 'y', ycent, ...
-    'ind', cent_ind);
+obj.centered_neuron = struct( 'x', xcent, 'y', ycent, 'ind', cent_ind);
+obj.side_neuron = struct( 'x', xside, 'y', yside, 'ind', side_ind); 
+obj.corner_neuron = struct( 'x', xcorn, 'y', ycorn, 'ind', corn_ind); 
 
 end

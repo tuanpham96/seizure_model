@@ -1,0 +1,175 @@
+# NOTES:
+# Field names are case-SENSITIVE 
+#
+# NOTATIONS: 
+# [OP]...   optional
+# [MC]...   may change due to some other settings in the same setup 
+# [KF]...   keep fixed for now because only there is only 1 available option 
+# ...[%%]   units 
+# [default] default options
+# 
+# SWEEPING VARIABLES:
+# These fields are recognized by having a subfield of 'vec'. Hence, please
+# don't name any fields ending with 'vec'. 
+# vec:      the variation sequences, for example:
+#           YAML                MATLAB VALUES           MATLAB TYPE   
+#           Example 1:
+#           [1,2,3]             [1,2,3]                 vector 
+#           Example 2: 
+#           [exp, gauss]        {'exp', 'gauss'}        cell array of strings
+#           Example 3:
+#           - [1,2,3]           {[1,2,3], ...           cell array of vectors 
+#           - [3,5,6]           [3,5,6]}
+#           Example 4: 
+#           -                   {[1,2,3;3,5,6], ...     cell array of matrices
+#               - [1,2,3]       [9,4,5;11,21,51]}
+#               - [3,5,6]
+#        	- 
+#               - [9,4,5]
+#               - [11,21,51] 
+#
+# label:    [OP] label of the sweeping variable 
+#           [default = 'a.b.c' if there exists `a.b.c.vec` but `no a.b.c.label`]
+
+# PATH AND FILE RELATED CONFIGURATIONS
+# paths:        storing all possible paths 
+#               data: for storage, will create "raw" and "processed" folders
+# file_prefix:  file prefix for the data 
+file_prefix: E2E_lattice
+paths:
+    data: sweep_data
+
+# SIMULATION TIME RELATED VARIABLES 
+# tstop:    stop time, assumed run from 0ms. [ms]
+# dt:       time step [ms]
+time:
+    tstop: 10000.0
+    dt: 0.1
+
+# SINGLE-NEURON RELATED VARIABLES 
+# num:      [MC] total number of neurons in the network
+# E_type:   [KF] excitatory type (currently only PYR)
+# I_type:   [KF] inhibitory type (currently on PV)
+# PE:       [MC] proportion of excitatory neurons
+# V_init:   initial condition for membrane potential 
+neurons: 
+    num: 900
+    E_type: PYR
+    I_type: PV
+    PE: 0.8
+    V_init: -60.0
+
+# SPATIAL DISTRIBUTION RELATED VARIABLES 
+# Either of these options:
+# 1. Rectangular 2D  
+# type: rect
+# size: [NUM_NEURON_IN_XAXIS, NUM_NEURON_IN_Y_AXIS]
+# 2. Spherical Fibonnaci lattice 3D 
+# type: sphere
+# norm: how to normalize the distance between points
+#       arc:  normalize by smallest arc length on the sphere surface
+#       eucl: by the smallest euclidean distance 
+#       [default = arc] 
+# 3. Lattice 2D
+# type: lattice 
+# lattice_template: a matrix of NUM_NEURON_PER_TEMPLATE x 2 (which is 
+#                   basically X and Y coordinate)
+# index_template:   a column vector of NUM_NEURON_PER_TEMPLATE signifying
+#                   if a neuron is excitatory (+1) or inhibitory (-1)
+# lattice_distance: distance between the templates 
+# NOTE: 
+#       (1) have not tested for user-defined lattice, so just use the
+#           default option for now, which is template of 4E & 1I neurons 
+#       (2) also, using this option would possibly change the number of
+#           neurons set above, as well as the ignoring the PE set above 
+space: 
+    type: lattice
+    lattice_distance: 2.0
+
+# SYNAPTIC CONNECTIVITY RELATED VARIABLES
+# weight:   weight (S) parameters (strength to scale to conductances)
+#           Has to have 4 subfields: EtoE, EtoI, ItoE, ItoI. Each of these
+#           subfields have to have these subfields: 
+#           type:   type of spatial-fall off
+#                  	exp:      m*exp(-d / k)
+#                   gauss:    m*exp(-d^2 / k)
+#                   rect:     m 
+#           k:  	decay factor, smaller means faster 
+#                   * error if k = inf and type ~= 'rect' 
+#           m:   	[OP] just a scalar factor times the weight 
+#                   [default = 1] 
+#           bound_weight: [OP] 2-element vector bound of weight (strength)
+#		         	anything below is set to lower bound, anything above is set
+#		         	to upper bound. 
+#		          	[default = [0,1]] 
+#           dist_range: [OP] 2-element vector bound of distance 
+#                   anything out of the distance range is set to `def_s`
+#		          	[default = [0, inf]]
+#           def:    [OP] default weight (strength) value if the distance
+#                   is out of `dist_range`
+#		        	[default = 0] 
+# scale:    scaling factor for conductance 
+#           unity:  no scaling 
+#       	linear: scaled by 1/NUM_NEURONS
+#           sqrt:   scaled by 1/sqrt(NUM_NEURONS)
+# conductance:  maximal condunctance to scale with weights and scales above
+#               Has to have 4 subfields: EtoE, EtoI, ItoE, ItoI. 
+connectivity:
+    E_type: AMPAR
+    I_type: GABAAR
+    weight: 
+        EtoE:
+            m:
+                vec: [1.5, 2]
+                label: m_e2e
+            k: 
+                vec: [10, 15] 
+                label: k_e2e
+            type: gauss
+            dist_range: [0, 8]  
+        EtoI:
+            k: 20
+            type: gauss
+            dist_range: [0, 15]
+        ItoE: 
+            k: 5
+            type: exp
+            dist_range: [0, 15]
+        ItoI: 
+            k: 5
+            type: exp
+            dist_range: [0, 15]
+    scale: sqrt
+    conductance: 
+        EtoE: 12.0
+        EtoI: 10.0
+        ItoE: 3.0
+        ItoI: 1.0
+# STIMULATION RELATED VARIABLES 
+# Iapp_max:         maximal applied current input amplitude 
+# fact_durramp:     factor of simulation time for ramp-up phase 
+# fact_decay:       decay factor for exponential decay after, 
+#                   meaning smaller -> faster
+# portion:          [OP] portion of neurons to stimulate 
+# num:              [OP] number of neurons to stimulate
+# location:         can only be "center", "side" or "corner" 
+#                   if, however, 'space.type = sphere', this cannot be done
+# NOTE: If 'num' is provided, 'portion' will be ignored. If 'portion' is 
+#       provided without 'num', 'num' will be calculated accordingly - but
+#       the calculated 'num' may not be exact percentage as requested if 
+#       "lattice" is used. 
+stimulation: 
+    Iapp_max: 800.0
+    fact_durramp: 0.6
+    fact_decay: 0.7
+    location: corner 
+    portion: 0.03
+
+# RATE ESTIMATION VARIABLES 
+# bin_size:     for binning to count spikes [second]
+# edge_lim:     [OP] the edge limit to count within [second]
+# smooth_size:  number of points to perform gaussian smoothing [points]
+# NOTE: If 'edge_lim' is not provided, it will be 'tstop' converted in sec. 
+rate_estimation:
+    bin_size: 0.02
+    smooth_size: 10.0
