@@ -12,7 +12,7 @@ struct_obj = ReadYaml(yaml_setup_file);
 field_list = recursive_fieldnames(struct_obj);
 [set_up, sim_var, field_names, var_alias] = find_sim_var(struct_obj, field_list);
 
-glob_pref = return_field_value(struct_obj, 'file_pref', 'sweep');
+glob_pref = return_field_value(struct_obj, 'file_prefix', 'sweep');
 if ~exist(sim_path, 'dir') 
     mkdir(sim_path);
 end
