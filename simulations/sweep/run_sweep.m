@@ -9,4 +9,4 @@ tic
 parse_setupfile(yaml_setup_file, sim_path, tmpl_path, rel_sim_data_path); 
 toc
 
-% run(fullfile(sim_path, 'init_sweep.m'))
+run(fullfile(sim_path, 'init_sweep.m'))
