@@ -35,15 +35,15 @@
 # paths:        storing all possible paths 
 #               data: for storage, will create "raw" and "processed" folders
 # file_prefix:  file prefix for the data 
-file_prefix: sweep_me_now
+file_prefix: E2E_lattice
 paths:
-    data: test_dat_path
+    data: sweep_data
 
 # SIMULATION TIME RELATED VARIABLES 
 # tstop:    stop time, assumed run from 0ms. [ms]
 # dt:       time step [ms]
 time:
-    tstop: 2000.0
+    tstop: 10000.0
     dt: 0.1
 
 # SINGLE-NEURON RELATED VARIABLES 
@@ -119,29 +119,30 @@ connectivity:
     I_type: GABAAR
     weight: 
         EtoE:
-            k:
-                vec: [0.7, 1, 2, 5] 
+            m:
+                vec: [1.5, 2]
+                label: m_e2e
+            k: 
+                vec: [10, 15] 
                 label: k_e2e
             type: gauss
-            dist_range: [0, 5]  
+            dist_range: [0, 8]  
         EtoI:
-            k: 8.0
+            k: 20
             type: gauss
             dist_range: [0, 15]
         ItoE: 
-            k: 20.0
-            type: gauss
+            k: 5
+            type: exp
+            dist_range: [0, 15]
         ItoI: 
-            k: 20.0
-            type: gauss
+            k: 5
+            type: exp
+            dist_range: [0, 15]
     scale: sqrt
     conductance: 
-        EtoE: 
-            vec: [10, 15, 20]
-            label: g_e2e
-        EtoI:
-            vec: [8, 10, 12] 
-            label: g_e2i
+        EtoE: 12.0
+        EtoI: 10.0
         ItoE: 3.0
         ItoI: 1.0
 # STIMULATION RELATED VARIABLES 
@@ -161,13 +162,14 @@ stimulation:
     Iapp_max: 800.0
     fact_durramp: 0.6
     fact_decay: 0.7
-    location: center 
+    location: corner 
     portion: 0.03
 
 # RATE ESTIMATION VARIABLES 
 # bin_size:     for binning to count spikes [second]
-# edge_lim:     the edge limit to count within [second]
+# edge_lim:     [OP] the edge limit to count within [second]
 # smooth_size:  number of points to perform gaussian smoothing [points]
+# NOTE: If 'edge_lim' is not provided, it will be 'tstop' converted in sec. 
 rate_estimation:
     bin_size: 0.02
     smooth_size: 10.0

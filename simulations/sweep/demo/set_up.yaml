@@ -1,0 +1,63 @@
+# PATH AND FILE RELATED CONFIGURATIONS
+file_prefix: demo
+paths:
+    data: sweep_data
+
+# SIMULATION TIME RELATED VARIABLES 
+time:
+    tstop: 10000.0
+    dt: 0.1
+
+# SINGLE-NEURON RELATED VARIABLES 
+neurons: 
+    num: 900
+    E_type: PYR
+    I_type: PV
+    PE: 0.8
+    V_init: -60.0
+
+# SPATIAL DISTRIBUTION RELATED VARIABLES 
+space: 
+    type: lattice
+    lattice_distance: 2.0
+
+# SYNAPTIC CONNECTIVITY RELATED VARIABLES
+connectivity:
+    E_type: AMPAR
+    I_type: GABAAR
+    weight: 
+        EtoE:
+            k: 10.0
+            m: 0.8 
+            type: gauss
+            dist_range: [0, 5]  
+        EtoI:
+            k: 10.0
+            m: 0.8
+            type: gauss
+            dist_range: [0, 15]
+        ItoE: 
+            k: 10
+            type: gauss
+        ItoI: 
+            k: 10
+            type: gauss
+    scale: sqrt
+    conductance: 
+        EtoE: 10.0
+        EtoI: 10.0
+        ItoE: 10.0
+        ItoI: 9.0
+# STIMULATION RELATED VARIABLES 
+stimulation: 
+    Iapp_max: 800.0
+    fact_durramp: 0.4
+    fact_decay: 0.7
+    location: 
+        vec: [center, corner]  
+    portion: 0.03
+
+# RATE ESTIMATION VARIABLES 
+rate_estimation:
+    bin_size: 0.02
+    smooth_size: 10.0

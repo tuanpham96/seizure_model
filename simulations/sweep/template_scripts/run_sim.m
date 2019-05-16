@@ -70,7 +70,10 @@ I_app = zeros(num_neurons, lenT);
 I_template = template_rampthendecay(T, set_up.stimulation.fact_durramp, set_up.stimulation.fact_decay);
 
 % 2. Specific input to random neighbors 
-stimulated_ind = net_arch.set_stimulated_indices(set_up.stimulation.location, set_up.stimulation.num);
+if ~isfield(set_up.stimulation, 'num')
+    num_stim = ceil(set_up.stimulation.portion*num_neurons);
+end
+stimulated_ind = net_arch.set_stimulated_indices(set_up.stimulation.location, num_stim);
 for i = stimulated_ind
     I_app(i,:) = set_up.stimulation.Iapp_max * I_template;
 end
@@ -224,16 +227,24 @@ for i = 1:num_neurons
     api = AP(i,:); 
     Spike_Times{i} = sort(api(api~=0)*dt/1000); 
 end
+rate_est_struct = set_up.rate_estimation; 
 
-PSTH = return_psth(Spike_Times, set_up.rate_estimation);
+if ~isfield(rate_est_struct, 'edge_lim')
+    rate_est_struct.edge_lim = [0, set_up.time.tstop]*1e-3;
+end
+PSTH = return_psth(Spike_Times, rate_est_struct);
 est_time = PSTH.centers;
 est_rate = PSTH.smoothed; 
 
 
 %% (I) SAVE DATA 
 
-data = struct();
+subsampled = 1000; 
+Tsec = Tsec(1:subsampled:end);
+I_template = I_template(1:subsampled:end); 
 
+data = struct();
+data.I_stim = struct('stim', I_template, 'time', Tsec); 
 data.Spike_Times = Spike_Times; 
 data.Total_Isyn = sum(I_syns,1);  
 data.Rate = struct('rate', est_rate, 'time', est_time); 

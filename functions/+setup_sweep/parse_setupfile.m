@@ -13,23 +13,33 @@ field_list = recursive_fieldnames(struct_obj);
 [set_up, sim_var, field_names, var_alias] = find_sim_var(struct_obj, field_list);
 
 glob_pref = return_field_value(struct_obj, 'file_pref', 'sweep');
+if ~exist(sim_path, 'dir') 
+    mkdir(sim_path);
+end
 
     function path_name = sim_file_path(file_name)
         path_name = fullfile(sim_path, file_name);
     end
 
 % Make "raw" and "processed" folders
-set_up.paths.data = fullfile(rel_sim_data_path, set_up.paths.data); 
-raw_path = fullfile(set_up.paths.data, 'raw'); 
-proc_path = fullfile(set_up.paths.data, 'processed'); 
+
+set_up.paths.data = fullfile(set_up.paths.data, set_up.file_prefix); 
+data_path = set_up.paths.data; 
+raw_path = fullfile(data_path, 'raw'); 
+proc_path = fullfile(data_path, 'processed');
+
+if ~exist(data_path, 'dir') 
+    mkdir(data_path);
+end
 if ~exist(raw_path, 'dir') 
     mkdir(raw_path);
 end
 if ~exist(proc_path, 'dir') 
     mkdir(proc_path);
 end
-set_up.paths.raw_data = raw_path; 
-set_up.paths.processed_data = proc_path; 
+set_up.paths.data = fullfile(rel_sim_data_path, data_path); 
+set_up.paths.raw_data = fullfile(rel_sim_data_path, raw_path); 
+set_up.paths.processed_data = fullfile(rel_sim_data_path, proc_path); 
 
 % Save structs, yaml files (book-keeping) and initialization script 
 save(sim_file_path('set_up.mat'), 'set_up'); 
@@ -44,12 +54,6 @@ copyfile([sim_tmpl_path '/*'], sim_path);
 fprintf(init_script, '\n%%%% Load set up files and add path \n'); 
 fprintf(init_script, 'load set_up.mat; \n'); 
 fprintf(init_script, 'load sim_var.mat; \n'); 
-
-% Define "edge_lim" if not present in the set up  
-if ~isfield(set_up.rate_estimation, 'edge_lim')
-    fprintf(init_script, '\n%%%% Define "edge_lim" for rate calculation \n'); 
-    fprintf(init_script, 'set_up.rate_estimation.edge_lim = [0, set_up.time.tstop]*1e-3; \n');
-end
 
 % Define *SIMGLOB variables and create COMBO
 fprintf(init_script, '\n%%%% Create variable combination and *SIMGLOB \n');
@@ -78,14 +82,6 @@ fprintf(init_script, [...
     ], glob_pref); 
 
 fprintf(init_script, '\t set_up.file_prefix = file_prefix; \n'); 
-
-% Define "stimulation.num" if not present 
-if ~isfield(set_up.stimulation, 'num') 
-    fprintf(init_script, [...
-        '\n\t%% Define "num" for stimulation purposes\n' ...
-        '\t set_up.stimulation.num = ' ...
-        'ceil(set_up.stimulation.portion*set_up.neurons.num); \n']);  
-end
 
 % Changing variables 
 fprintf(init_script, '\n\t%%%% Change requested variations\n'); 

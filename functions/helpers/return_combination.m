@@ -1,6 +1,6 @@
 function varargout = return_combination(varargin)
-if nargin == 1
-    error('Need more than just 1 input');
+if nargin == 1 && ~isstruct(varargin{1})
+    error('Need more than just 1 input that is not a struct');
 end
 
 inp_has_param = any(cellfun(@ischar, varargin, 'uni', 1)); 
