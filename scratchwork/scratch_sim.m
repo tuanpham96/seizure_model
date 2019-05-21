@@ -17,15 +17,15 @@ exc_syn = SYN_PRM.AMPAR;
 inh_syn = SYN_PRM.GABAAR;  %#ok<NASGU>
 
 %% Simulation time parameters
-simt=10000; % ms 
+simt=5000; % ms 
 dt=1/100;
 T=0:dt:simt;
 lenT = length(T); 
 
 Tsec = T/1000; 
 %% Define neurons 
-N_nrn = 30;
-prob_e = 0.8;
+N_nrn = 2;
+prob_e = 0.5;
 V_init = -60; 
 
 Ne = ceil(prob_e*N_nrn); 
@@ -68,20 +68,20 @@ del_i = delay_S_i/dt;
 
 % http://graphonline.ru/en/
 
-Emat = [ ...
-	 0     0     0     0     0     0
-     0.1   0   0     0     0     0
-     0     0.1   0     0     0     0
-     0     0     0     0     0     0
-     0.1   0     0     0     0     0
-     0     0.1   0     0     0     0] * 70; 
-Imat = [ ...
-	 0     0     0     1     0     0
-     0     0     0     0     1     0
-     0     0     0     0     0     1
-     0     0     0     0     0     0
-     0     0     0     0     0     0
-     0     0     0     0     0     0] * 3; 
+% Emat = [ ...
+% 	 0     0     0     0     0     0
+%      0.1   0   0     0     0     0
+%      0     0.1   0     0     0     0
+%      0     0     0     0     0     0
+%      0.1   0     0     0     0     0
+%      0     0.1   0     0     0     0] * 70; 
+% Imat = [ ...
+% 	 0     0     0     1     0     0
+%      0     0     0     0     1     0
+%      0     0     0     0     0     1
+%      0     0     0     0     0     0
+%      0     0     0     0     0     0
+%      0     0     0     0     0     0] * 3; 
 
 % Emat = [ ...
 % 	 0     0     0     0
@@ -94,9 +94,14 @@ Imat = [ ...
 %      0     0     0     0
 %      0     0     0     0] * 2; 
 
-zero_self = 1-eye(N_nrn); 
-Emat = 10*rand(N_nrn).*zero_self; 
-Imat = 5*rand(N_nrn).*zero_self; 
+% zero_self = 1-eye(N_nrn); 
+% Emat = 10*rand(N_nrn).*zero_self; 
+% Imat = 5*rand(N_nrn).*zero_self; 
+
+Emat = [0,0;3,0]; 
+Imat = [0,1;0,0]; 
+
+
 %% Initialization 
 V = zeros(N_nrn, lenT); 
 AP = zeros(N_nrn, lenT); 
@@ -126,24 +131,24 @@ tmp_triangle(ceil(lenT/2):end) = linspace(1,0,ceil(lenT/2));
 tmp_ramp = linspace(0,1,lenT); 
 
 tmp_ramp_decay = zeros(1, lenT); 
-dur_ramp = ceil(4*lenT/5);
+dur_ramp = ceil(3.5*lenT/5);
 tmp_ramp_decay(1:dur_ramp) = linspace(0,1,dur_ramp); 
-tmp_ramp_decay(dur_ramp+1:end) = exp(-(0:(lenT-dur_ramp-1))/(T(end))); 
+tmp_ramp_decay(dur_ramp+1:end) = exp(-(0:(lenT-dur_ramp-1))/(4*T(end))); 
 
 I_template = 700*tmp_ramp_decay; 
 
 decay = 0.5; 
-I_app(1,:) = I_template; 
-I_app(4,:) = I_template; 
-
-I_app(2,:) = decay*I_template; 
-I_app(5,:) = decay*I_template; 
-
-I_app(3,:) = decay^2*I_template; 
-I_app(6,:) = decay^2*I_template; 
+% I_app(1,:) = I_template; 
+% I_app(4,:) = I_template; 
+% 
+% I_app(2,:) = decay*I_template; 
+% I_app(5,:) = decay*I_template; 
+% 
+% I_app(3,:) = decay^2*I_template; 
+% I_app(6,:) = decay^2*I_template; 
  
-% I_app(1,:) = 400*I_template; 
-% I_app(3,:) = 400*I_template; 
+I_app(1,:) = I_template; 
+I_app(2,:) = I_template; 
 %% Other parameters 
 APVf_thr = 20; 
 d_APt = 1.5; 
@@ -200,7 +205,7 @@ while (t < simt)
             Xi(:,k+del_i) = Imat*cond_spk; 
         end
         
-        p(cond_spk) = p(cond_spk) + 1;        
+        p = p + 1;      
         
         vf_km2 = vf_km1;
     end
@@ -253,6 +258,20 @@ end
 
 toc 
 
+%%
+
+figure; 
+ax1 = subplot(311); hold on; 
+plot(T/1000, I_template(1,:), '-k', 'LineWidth', 2.5); 
+set(gca, 'visible', 'off'); 
+ax2 = subplot(312); hold on; 
+plot(T/1000, V(1,:), '-', 'Color', [0,0.1,0.7], 'LineWidth', 2); 
+set(gca, 'visible', 'off'); 
+ax3 = subplot(313); hold on; 
+plot(T/1000, V(2,:), '-', 'Color', [0.9,0,0], 'LineWidth', 2); 
+set(gca, 'visible', 'off'); 
+linkaxes([ax1,ax2,ax3],'x'); 
+xlim([0,4.9])
 %%
 % figure; 
 % set(gcf, 'PaperOrientation','landscape','color','w');

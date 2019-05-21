@@ -53,7 +53,7 @@ classdef NetworkArchitecture < handle
 
         visualize_connection_matrices(obj, varargin)
 
-        create_activity_movie(obj, vid_name, t_res, resp, t_in, inp, further_marked)
+        create_activity_movie(obj, vid_name, t_res, resp, t_in, inp, further_marked, color_opt)
             
     end
 

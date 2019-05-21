@@ -1,7 +1,7 @@
 dt = 1/100;
 t = 0:dt:100; 
 tau_alphasyn = 3; 
-tau_r = 10; 
+tau_r = 2; 
 tau_d = 20; 
 
 alpha_syn = (1/tau_alphasyn)*t.*exp(-t/tau_alphasyn); 
@@ -14,7 +14,7 @@ exp2_syn = exp2_syn/max_peak;
 figure;
 hold on; 
 plot(t, alpha_syn); 
-plot(t, exp2_syn);
+% plot(t, exp2_syn);
 xlim([0, 100]);
 
 %%
