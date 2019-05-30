@@ -21,25 +21,32 @@ end
         path_name = fullfile(sim_path, file_name);
     end
 
-% Make "raw" and "processed" folders
+% Make "raw" and "processed" data folders + script folder
+% the script folder is just for referencing - currently the scripts to run
+% the simulation is stored in `sim_path` for version control purposes;
+% whereas the script folder in the data folder is just another copy for
+% referencing 
 
 set_up.paths.data = fullfile(set_up.paths.data, set_up.file_prefix); 
-data_path = set_up.paths.data; 
-raw_path = fullfile(data_path, 'raw'); 
-proc_path = fullfile(data_path, 'processed');
+paths = struct(); 
+paths.data = set_up.paths.data; 
+paths.raw_data = fullfile(paths.data, 'raw'); 
+paths.processed_data = fullfile(paths.data, 'processed');
+paths.script = fullfile(paths.data, 'script'); 
 
-if ~exist(data_path, 'dir') 
-    mkdir(data_path);
+path_fields = fieldnames(paths); 
+for i = 1:length(path_fields) 
+    field_i = path_fields{i}; 
+    path_i = paths.(field_i); 
+    
+    % create folder if not already there 
+    if ~exist(path_i, 'dir') 
+        mkdir(path_i);
+    end
+    
+    % this is for referencing when saving 
+    set_up.paths.(field_i) = fullfile(rel_sim_data_path, path_i);
 end
-if ~exist(raw_path, 'dir') 
-    mkdir(raw_path);
-end
-if ~exist(proc_path, 'dir') 
-    mkdir(proc_path);
-end
-set_up.paths.data = fullfile(rel_sim_data_path, data_path); 
-set_up.paths.raw_data = fullfile(rel_sim_data_path, raw_path); 
-set_up.paths.processed_data = fullfile(rel_sim_data_path, proc_path); 
 
 % Save structs, yaml files (book-keeping) and initialization script 
 save(sim_file_path('set_up.mat'), 'set_up'); 
@@ -101,5 +108,9 @@ fprintf(init_script, [ ...
     '\n%%%% Save `sweep_master` for book-keeping purposes\n' ...
     'sweep_master = combo_struct_SIMGLOB; \n' ... 
     'save(fullfile(set_up.paths.data, ''sweep_master.mat''), ''sweep_master''); \n']);  
+
+% Copy simulation script folder to data folder 
+copyfile([sim_path '/*'], paths.script); 
+
 end
 
