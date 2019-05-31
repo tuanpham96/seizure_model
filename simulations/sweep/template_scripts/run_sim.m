@@ -77,7 +77,8 @@ stimulated_ind = net_arch.set_stimulated_indices(set_up.stimulation.location, nu
 for i = stimulated_ind
     I_app(i,:) = set_up.stimulation.Iapp_max * I_template;
 end
-
+% dc_app = 80; 
+% I_app = I_app + dc_app;  
 %% (F) INITIALIZATION 
 
 % 1. Initilize for storage and access
