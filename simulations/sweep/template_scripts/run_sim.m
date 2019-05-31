@@ -67,8 +67,8 @@ I_app = zeros(num_neurons, lenT);
 
 % 1. Template 
 % TODO: NEED TO UPDATE for generalization 
-I_template = template_rampthendecay(T, set_up.stimulation.fact_durramp, set_up.stimulation.fact_decay);
-
+% I_template = template_rampthendecay(T, set_up.stimulation.fact_durramp, set_up.stimulation.fact_decay);
+I_template = template_rectanglepulse(T,  set_up.stimulation.fact_dur); 
 % 2. Specific input to random neighbors 
 if ~isfield(set_up.stimulation, 'num')
     num_stim = ceil(set_up.stimulation.portion*num_neurons);
